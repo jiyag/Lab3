@@ -42,7 +42,6 @@ public class CountryCodeConverter {
                 // Split the line by tabs
                 String[] parts = line.split("\t");
 
-                // Ensure that the line contains exactly 4 parts: Country Name, 2-letter code, 3-letter code, Numeric code
                 if (parts.length == EXPECTED_PARTS) {
                     String countryName = parts[0].trim();
                     String alpha2Code = parts[1].trim();
