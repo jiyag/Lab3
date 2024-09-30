@@ -14,8 +14,7 @@ import java.util.Objects;
  */
 public class CountryCodeConverter {
 
-    private static final int EXPECTED_PARTS = 3;
-
+    private static final int EXPECTED_PARTS = 4;
     private Map<String, String> countryCodeMap;
 
     /**
@@ -40,12 +39,19 @@ public class CountryCodeConverter {
 
             // Populate the map with country codes and names from the file
             for (String line : lines) {
-                // assuming tab-separated values
+                // Split the line by tabs
                 String[] parts = line.split("\t");
-                // ensure there are enough parts (alpha-2, alpha-3, and country name)
-                if (parts.length >= EXPECTED_PARTS) {
-                    // store alpha-3 code and country name
-                    countryCodeMap.put(parts[2].trim(), parts[0].trim());
+
+                // Ensure that the line contains exactly 4 parts: Country Name, 2-letter code, 3-letter code, Numeric code
+                if (parts.length == EXPECTED_PARTS) {
+                    String countryName = parts[0].trim();
+                    String alpha2Code = parts[1].trim();
+                    String alpha3Code = parts[2].trim();
+                    // We're ignoring the numeric code for now, but you could use it if necessary
+
+                    // Store both 2-letter and 3-letter codes with the country name in the map
+                    countryCodeMap.put(alpha2Code, countryName);
+                    countryCodeMap.put(alpha3Code, countryName);
                 }
             }
         }
@@ -56,11 +62,11 @@ public class CountryCodeConverter {
 
     /**
      * Returns the name of the country for the given country code.
-     * @param code the 3-letter code of the country
+     * @param code the 2-letter or 3-letter code of the country
      * @return the name of the country corresponding to the code
      */
     public String fromCountryCode(String code) {
-        return countryCodeMap.getOrDefault(code, "unknown country code");
+        return countryCodeMap.getOrDefault(code.trim().toUpperCase(), "unknown country code");
     }
 
     /**
@@ -82,6 +88,6 @@ public class CountryCodeConverter {
      * @return how many countries are included in this code converter.
      */
     public int getNumCountries() {
-        return countryCodeMap.size();
+        return (int) countryCodeMap.values().stream().distinct().count() - 1;
     }
 }
