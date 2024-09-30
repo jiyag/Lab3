@@ -7,13 +7,16 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * This class provides the service of converting country codes to their names.
  */
 public class CountryCodeConverter {
 
-    // TODO Task: pick appropriate instance variable(s) to store the data necessary for this class
+    private static final int EXPECTED_PARTS = 3;
+
+    private Map<String, String> countryCodeMap;
 
     /**
      * Default constructor which will load the country codes from "country-codes.txt"
@@ -29,18 +32,26 @@ public class CountryCodeConverter {
      * @throws RuntimeException if the resource file can't be loaded properly
      */
     public CountryCodeConverter(String filename) {
-
+        countryCodeMap = new HashMap<>();
         try {
+            // Read all lines from the specified file
             List<String> lines = Files.readAllLines(Paths.get(getClass()
                     .getClassLoader().getResource(filename).toURI()));
 
-            // TODO Task: use lines to populate the instance variable(s)
-
+            // Populate the map with country codes and names from the file
+            for (String line : lines) {
+                // assuming tab-separated values
+                String[] parts = line.split("\t");
+                // ensure there are enough parts (alpha-2, alpha-3, and country name)
+                if (parts.length >= EXPECTED_PARTS) {
+                    // store alpha-3 code and country name
+                    countryCodeMap.put(parts[2].trim(), parts[0].trim());
+                }
+            }
         }
         catch (IOException | URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
-
     }
 
     /**
@@ -49,8 +60,7 @@ public class CountryCodeConverter {
      * @return the name of the country corresponding to the code
      */
     public String fromCountryCode(String code) {
-        // TODO Task: update this code to use an instance variable to return the correct value
-        return code;
+        return countryCodeMap.getOrDefault(code, "unknown country code");
     }
 
     /**
@@ -59,8 +69,12 @@ public class CountryCodeConverter {
      * @return the 3-letter code of the country
      */
     public String fromCountry(String country) {
-        // TODO Task: update this code to use an instance variable to return the correct value
-        return country;
+        for (Map.Entry<String, String> entry : countryCodeMap.entrySet()) {
+            if (Objects.equals(entry.getValue(), country)) {
+                return entry.getKey();
+            }
+        }
+        return "unknown country";
     }
 
     /**
@@ -68,7 +82,6 @@ public class CountryCodeConverter {
      * @return how many countries are included in this code converter.
      */
     public int getNumCountries() {
-        // TODO Task: update this code to use an instance variable to return the correct value
-        return 0;
+        return countryCodeMap.size();
     }
 }
